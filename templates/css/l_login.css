@@ -1,0 +1,42 @@
+body{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80vh;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    background-image: url(https://www.shutterstock.com/image-photo/dark-chalk-board-colored-pencils-drawing-1073540852);
+    
+}
+
+.login-container{
+    text-align: center;
+    background-color: antiquewhite;
+    height: 400px;
+    width: 300px;
+    border-radius: 15px;
+    border: solid rgba(218, 182, 135, 0.436) 5px;
+}
+
+.input-group{
+    margin-top: 80px;
+    margin-bottom: 10px;
+}
+
+input{
+    margin-bottom: 40px;
+    width: 240px;
+    height: 30px;
+    border-radius: 16px;
+}
+
+button{
+    cursor: pointer;
+    margin-top: 30px;
+    width: 240px;
+    height: 30px;
+    background-color: rgba(0, 0, 255, 0.804);
+    color: white;
+    font-size: 15px;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    border-radius: 20px;
+}
