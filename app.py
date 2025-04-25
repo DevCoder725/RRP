@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib 
 matplotlib.use('Agg')
+import os
 
 app = Flask(__name__)
 
@@ -255,11 +256,14 @@ def performance():
         plt.xlabel("subjects")
         plt.ylabel("marks")
         plt.legend()
-        plt.savefig('static/myplot.png')
-        return render_template('performance.html',plot = "static/myplot.png")
-    return redirect('/s_dashboard')
+        
+        static_dir = os.path.join("RRP", "static")
+        os.makedirs(static_dir, exist_ok=True)
+        perfplotpath = os.path.join(static_dir,"performance.png")
+        plt.savefig(perfplotpath)
+        return render_template("performance.html",plot = "performance.png",mark = 10)
+    return redirect('/student')
 
-#MID 1 route
 @app.route('/mid_1')
 def exam():
     if 'sid' in session:
@@ -267,36 +271,48 @@ def exam():
         c = conn.cursor()
         c.execute("SELECT m1, ecse, se, sd FROM MID_1 WHERE sid = ?", (session['sid'],))
         marks = c.fetchone()
-        m = np.array(marks)
-        total_ps = np.sum(m)
         avg = []
         max = []
         m1_marks = []
         ecse_marks = []
         se_marks = []
         sd_marks = []
-        c.execute("SELECT m1, ecse, se, sd FROM MID_1")
-        all_marks = c.fetchall()
-        for row in all_marks:
-            m1_marks.append(row[0])
-            ecse_marks.append(row[1])
-            se_marks.append(row[2])
-            sd_marks.append(row[3])
-        max = [np.max(m1_marks), np.max(ecse_marks), np.max(se_marks), np.max(sd_marks)]
-        avg = [np.mean(m1_marks), np.mean(ecse_marks), np.mean(se_marks), np.mean(sd_marks)]
-        subjects = ["m1", "ecse", "se", "sd"]
-        plt.plot(subjects, marks, color="blue",marker="o", label="Student")
-        plt.plot(subjects, max, color="red", marker="o", label="Max")
-        plt.plot(subjects, avg, color="green", marker="o", label="Avg")
-        plt.title("Subject-wise Mid_1 Analysis")
+        c.execute("SELECT m1,ecse,se,sd FROM MID_1")
+        new = c.fetchall()
+        print(new[0])
+        for i in new:
+            m1_marks.append(i[0])
+            ecse_marks.append(i[1])
+            se_marks.append(i[2])
+            sd_marks.append(i[3])
+        max = [np.max(m1_marks),np.max(ecse_marks),np.max(se_marks),np.max(sd_marks)]
+        avg = [np.mean(m1_marks),np.mean(ecse_marks),np.mean(se_marks),np.mean(sd_marks)]
+        print(avg)
+        print(max)
+        subjects = ["ecse","se","sd","m1"]
+        plt.plot(subjects,marks,color="blue",marker="o",label="student")
+        plt.plot(subjects,max,color="red",marker="o",label="max")
+        plt.plot(subjects,avg,color="green",marker="o",label="avg")
+        plt.title("Subject wise Mid_1 analysis")
         plt.xlabel("Subjects")
-        plt.ylabel("Marks")
+        plt.ylabel("marks")
         plt.legend()
-        # Save the plot as an image file
-        plt.savefig("static/mid_1_analysis.png")
-        plt.close()  # Close the plot to release resources
+        # Ensure static directory exists
+        static_dir = os.path.join("static")
+        os.makedirs(static_dir, exist_ok=True)
         
-        return render_template('mid_1.html', marks=marks, subjects=subjects,n=4, plot="static/mid_1_analysis.png",pie="static/mid_1_piechart.png")
+        # Save plot
+        plot_path = os.path.join("static", "mid_1_analysis.png")
+        plt.savefig(plot_path)
+        plt.close()
+        
+        plt.pie(marks, labels=subjects, autopct='%1.1f%%', startangle=140)
+        plt.title("Mid_1 Marks Distribution")
+        pie_plot_path = os.path.join(static_dir, "mid_1_piechart.png")
+        plt.savefig(pie_plot_path)
+        plt.close()        
+        # Render template with data
+        return render_template('mid_1.html', marks=marks, subjects=subjects, n=len(subjects), plot="mid_1_analysis.png",pie = "mid_1_piechart.png")
     return redirect('/logout')
 
 # MID 2 route
@@ -333,49 +349,72 @@ def mid_2():
         plt.xlabel("Subjects")
         plt.ylabel("marks")
         plt.legend()
-        plt.savefig("static/mid_2_analysis.png")
+        # Ensure static directory exists
+        static_dir = os.path.join("static")
+        os.makedirs(static_dir, exist_ok=True)
+        
+        # Save plot
+        plot_path = os.path.join("static", "mid_2_analysis.png")
+        plt.savefig(plot_path)
         plt.close()
-        return render_template('mid_2.html', marks = marks, subjects = subjects, n=4, plot='static/mid_2_analysis.png')
+        
+        plt.pie(marks, labels=subjects, autopct='%1.1f%%', startangle=140)
+        plt.title("Mid_2 Marks Distribution")
+        pie_plot_path = os.path.join(static_dir, "mid_2_piechart.png")
+        plt.savefig(pie_plot_path)
+        plt.close()        
+        # Render template with data
+        return render_template('mid_2.html', marks=marks, subjects=subjects, n=len(subjects), plot="mid_2_analysis.png",pie = "mid_2_piechart.png")
     return redirect('/logout')
 
 # END_SEM  route
 @app.route('/end_sem')
 def end_sem():
-    if 'sid' in session:
-        conn = sqlite3.connect('rrp.db')
-        c = conn.cursor()
-        c.execute("SELECT m1, ecse, se, sd FROM End_Semester WHERE sid = ?", (session['sid'],))
-        marks = c.fetchone()
-        avg = []
-        max = []
-        m1_marks = []
-        ecse_marks = []
-        se_marks = []
-        sd_marks = []
-        c.execute("SELECT m1,ecse,se,sd FROM End_Semester")
-        new = c.fetchall()
-        print(new[0])
-        for i in new:
-            m1_marks.append(i[0])
-            ecse_marks.append(i[1])
-            se_marks.append(i[2])
-            sd_marks.append(i[3])
-        max = [np.max(m1_marks),np.max(ecse_marks),np.max(se_marks),np.max(sd_marks)]
-        avg = [np.mean(m1_marks),np.mean(ecse_marks),np.mean(se_marks),np.mean(sd_marks)]
-        print(avg)
-        print(max)
-        subjects = ["ecse","se","sd","m1"]
-        plt.plot(subjects,marks,color="blue",marker="o",label="student")
-        plt.plot(subjects,max,color="red",marker="o",label="max")
-        plt.plot(subjects,avg,color="green",marker="o",label="avg")
-        plt.title("Subject wise End_Semester analysis")
-        plt.xlabel("Subjects")
-        plt.ylabel("marks")
-        plt.legend()
-        plt.savefig("static/sem_analysis.png")
-        plt.close()
-        return render_template('end_sem.html', marks = marks, subjects = subjects, n=4,plot='static/sem_analysis.png')
-    return redirect('/logout')
+    if 'sid' not in session:
+        return redirect('/logout')
+    conn = sqlite3.connect('rrp.db')
+    c = conn.cursor()
+        
+    c.execute("SELECT m1, ecse, se, sd FROM End_Semester WHERE sid = ?", (session['sid'],))
+    marks = c.fetchone()
+        
+    c.execute("SELECT m1, ecse, se, sd FROM End_Semester")
+    all_marks = c.fetchall()
+        
+    if not all_marks:
+        return render_template('error.html', message="No marks data available in the database")
+    m1_marks = []
+    ecse_marks = []
+    se_marks = []
+    sd_marks = []
+    
+    for row in all_marks:
+        m1_marks.append(row[0])
+        ecse_marks.append(row[1])
+        se_marks.append(row[2])
+        sd_marks.append(row[3])
+        
+    max_marks = [np.max(m1_marks), np.max(ecse_marks), np.max(se_marks), np.max(sd_marks)]
+    avg_marks = [np.mean(m1_marks), np.mean(ecse_marks), np.mean(se_marks), np.mean(sd_marks)]
+
+    subjects = ["M1", "ECSE", "SE", "SD"]
+        
+    plt.figure(figsize=(8, 6))
+    plt.plot(subjects, marks, color="blue", marker="o", label="Student")
+    plt.plot(subjects, max_marks, color="red", marker="o", label="Max")
+    plt.plot(subjects, avg_marks, color="green", marker="o", label="Avg")
+    plt.title("Subject-wise End Semester Analysis")
+    plt.xlabel("Subjects")
+    plt.ylabel("Marks")
+    plt.legend()
+        
+    static_dir = os.path.join("static")
+    os.makedirs(static_dir, exist_ok=True)
+    plot_path = os.path.join("static", "sem_analysis.png")
+    plt.savefig(plot_path)
+    plt.close()
+    return render_template('end_sem.html', marks=marks, subjects=subjects, n=len(subjects), plot="/static/sem_analysis.png")
+
 
 # logout
 @app.route('/logout',methods=['GET','POST'])
