@@ -243,30 +243,34 @@ def performance():
     conn = sqlite3.connect('rrp.db')
     c = conn.cursor()
     if ('sid' in session) :
+        sid = session['sid']
         exams = ["MID_1","MID_2","End_Semester"]
         colors = ["skyblue","lightgreen","orange","red"]
         for i in range(0,3):
             c.execute(f"SELECT ecse,se,sd,m1 from {exams[i]} where sid = ?",(session['sid'],))
             res = c.fetchone()
+            print("tuple:",res)
             res = list(res)
             subjects = ["ecse","se","sd","m1"]
             print(res)
             plt.plot(subjects,res,color=f"{colors[i]}",marker="o",label=f"{exams[i]}")
-        plt.title("Your performance in each subject!")
+        plt.title(f"Performance in each subject for {sid}!!")
         plt.xlabel("subjects")
         plt.ylabel("marks")
-        plt.legend()
-        
+        plt.legend()        
         static_dir = os.path.join("RRP", "static")
+        print(static_dir)
         os.makedirs(static_dir, exist_ok=True)
-        perfplotpath = os.path.join(static_dir,"performance.png")
+        perfplotpath = os.path.join(static_dir,f"performance.png")
         plt.savefig(perfplotpath)
-        return render_template("performance.html",plot = "performance.png",mark = 10)
+        plt.close()
+        return render_template("performance.html",plot = f"performance.png",mark = 10)
     return redirect('/student')
 
 @app.route('/mid_1')
 def exam():
     if 'sid' in session:
+        sid = session['sid']
         conn = sqlite3.connect('rrp.db')
         c = conn.cursor()
         c.execute("SELECT m1, ecse, se, sd FROM MID_1 WHERE sid = ?", (session['sid'],))
@@ -293,32 +297,31 @@ def exam():
         plt.plot(subjects,marks,color="blue",marker="o",label="student")
         plt.plot(subjects,max,color="red",marker="o",label="max")
         plt.plot(subjects,avg,color="green",marker="o",label="avg")
-        plt.title("Subject wise Mid_1 analysis")
+        plt.title(f"Subject wise Mid_1 analysis for ")
         plt.xlabel("Subjects")
         plt.ylabel("marks")
         plt.legend()
         # Ensure static directory exists
-        static_dir = os.path.join("static")
+        static_dir = os.path.join("RRP","static")
         os.makedirs(static_dir, exist_ok=True)
-        
         # Save plot
-        plot_path = os.path.join("static", "mid_1_analysis.png")
+        plot_path = os.path.join(static_dir, f"mid_1_analysis.png")
         plt.savefig(plot_path)
         plt.close()
-        
         plt.pie(marks, labels=subjects, autopct='%1.1f%%', startangle=140)
-        plt.title("Mid_1 Marks Distribution")
-        pie_plot_path = os.path.join(static_dir, "mid_1_piechart.png")
+        plt.title(f"Mid_1 Marks Distribution for {sid} ")
+        pie_plot_path = os.path.join(static_dir, f"mid_1_piechart.png")
         plt.savefig(pie_plot_path)
         plt.close()        
         # Render template with data
-        return render_template('mid_1.html', marks=marks, subjects=subjects, n=len(subjects), plot="mid_1_analysis.png",pie = "mid_1_piechart.png")
+        return render_template('mid_1.html', marks=marks, subjects=subjects, n=len(subjects), plot=f"mid_1_analysis.png",pie = f"mid_1_piechart.png")
     return redirect('/logout')
 
 # MID 2 route
 @app.route('/mid_2')
 def mid_2():
     if 'sid' in session:
+        sid = session['sid']
         conn = sqlite3.connect('rrp.db')
         c = conn.cursor()
         c.execute("SELECT m1, ecse, se, sd FROM MID_2 WHERE sid = ?", (session['sid'],))
@@ -345,26 +348,26 @@ def mid_2():
         plt.plot(subjects,marks,color="blue",marker="o",label="student")
         plt.plot(subjects,max,color="red",marker="o",label="max")
         plt.plot(subjects,avg,color="green",marker="o",label="avg")
-        plt.title("Subject wise Mid_2 analysis")
+        plt.title(f"Subject wise Mid_2 analysis for ")
         plt.xlabel("Subjects")
         plt.ylabel("marks")
         plt.legend()
         # Ensure static directory exists
-        static_dir = os.path.join("static")
+        static_dir = os.path.join("RRP","static")
         os.makedirs(static_dir, exist_ok=True)
         
         # Save plot
-        plot_path = os.path.join("static", "mid_2_analysis.png")
+        plot_path = os.path.join(static_dir, f"mid_2_analysis.png")
         plt.savefig(plot_path)
         plt.close()
         
         plt.pie(marks, labels=subjects, autopct='%1.1f%%', startangle=140)
-        plt.title("Mid_2 Marks Distribution")
-        pie_plot_path = os.path.join(static_dir, "mid_2_piechart.png")
+        plt.title(f"Mid_2 Marks Distribution for {sid}")
+        pie_plot_path = os.path.join(static_dir, f"mid_2_piechart.png")
         plt.savefig(pie_plot_path)
         plt.close()        
         # Render template with data
-        return render_template('mid_2.html', marks=marks, subjects=subjects, n=len(subjects), plot="mid_2_analysis.png",pie = "mid_2_piechart.png")
+        return render_template('mid_2.html', marks=marks, subjects=subjects, n=len(subjects), plot="mid_2_analysis.png",pie = f"mid_2_piechart.png")
     return redirect('/logout')
 
 # END_SEM  route
@@ -408,9 +411,9 @@ def end_sem():
     plt.ylabel("Marks")
     plt.legend()
         
-    static_dir = os.path.join("static")
+    static_dir = os.path.join("RRP","static")
     os.makedirs(static_dir, exist_ok=True)
-    plot_path = os.path.join("static", "sem_analysis.png")
+    plot_path = os.path.join(static_dir, "sem_analysis.png")
     plt.savefig(plot_path)
     plt.close()
     return render_template('end_sem.html', marks=marks, subjects=subjects, n=len(subjects), plot="/static/sem_analysis.png")
