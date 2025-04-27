@@ -5,6 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Overall Performance</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        table {
+            width: 80%;
+            border-collapse: collapse;
+            margin: 20px auto;
+            font-family: Arial, sans-serif;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: hsl(42, 100%, 48%);
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+    </style>
 </head>
 <body class="bg-light">
     <!-- Navbar -->
@@ -29,13 +49,32 @@
         <h1 class="text-center text-secondary">Overall Performance</h1>
         <form method="POST" action="/performance">
             <div class="mb-3">
-                <input type="number" class="form-control w-25" name="target" placeholder="Enter Target Marks" required>
+                <input type="number" class="form-control w-25" name="target" placeholder="Enter Target GPA" max="10" min="6" required>
             </div>
             <button type="submit" class="btn btn-primary">Submit</button>
-            {% if mark %}
-            <p class="mt-2">You need {{ mark }} marks to reach the target!</p>
-            {% endif %}
         </form>
+    </div>
+
+    <!-- Performance Table -->
+    <div class="container mt-4">
+        <h4 class="text-center text-secondary">You Need The Following Marks Subjectwise To Reach Your Goal</h4>
+        <table>
+            <thead>
+                <tr>
+                    <th>M1</th>
+                    <th>ECSE</th>
+                    <th>SE</th>
+                    <th>SD</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                {% for i in range(length) %}
+                    <td>{{ mark[i] }}</td>
+                {% endfor %}
+                </tr>
+            </tbody>
+        </table>
     </div>
 
     <div class="container mt-4">

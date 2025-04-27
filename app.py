@@ -238,7 +238,7 @@ def past_exams():
     return redirect('/logout')
 
 # Performance route
-@app.route('/performance')
+@app.route('/performance',methods=["GET","POST"])
 def performance():
     conn = sqlite3.connect('rrp.db')
     c = conn.cursor()
@@ -246,6 +246,28 @@ def performance():
         sid = session['sid']
         exams = ["MID_1","MID_2","End_Semester"]
         colors = ["skyblue","lightgreen","orange","red"]
+        variable = -1
+        length = 0
+        if(request.method == "POST"):
+            target = request.form.get("target")
+            print(target)
+            target = int(target)
+            target_marks = (target*10) - 10
+            mid_avg = []
+            req_marks = []
+            c.execute("SELECT m1, ecse, se, sd FROM MID_1 WHERE sid = ?", (session['sid'],))
+            mid1_marks = list(c.fetchone())
+            print(mid1_marks)
+            c.execute("SELECT m1, ecse, se, sd FROM MID_2 WHERE sid = ?", (session['sid'],))
+            mid2_marks = list(c.fetchone())
+            print(mid2_marks)
+            for i in range(len(mid1_marks)):
+                mid_avg.append((mid1_marks[i]+mid2_marks[i])/2)
+                req_marks.append((target_marks - mid_avg[i]))
+            print("mid_avg",mid_avg)
+            print("req_marks",req_marks)
+            length = len(req_marks)
+            variable = req_marks      
         for i in range(0,3):
             c.execute(f"SELECT ecse,se,sd,m1 from {exams[i]} where sid = ?",(session['sid'],))
             res = c.fetchone()
@@ -254,6 +276,9 @@ def performance():
             subjects = ["ecse","se","sd","m1"]
             print(res)
             plt.plot(subjects,res,color=f"{colors[i]}",marker="o",label=f"{exams[i]}")
+        plt.grid(True)
+        plt.yticks(range(0, 62,5))
+        plt.xticks(range(0,4))
         plt.title(f"Performance in each subject for {sid}!!")
         plt.xlabel("subjects")
         plt.ylabel("marks")
@@ -264,7 +289,8 @@ def performance():
         perfplotpath = os.path.join(static_dir,f"performance.png")
         plt.savefig(perfplotpath)
         plt.close()
-        return render_template("performance.html",plot = f"performance.png",mark = 10)
+
+        return render_template("performance.html",plot = f"performance.png",mark = variable,length = length)
     return redirect('/student')
 
 @app.route('/mid_1')
