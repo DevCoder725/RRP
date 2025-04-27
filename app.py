@@ -276,10 +276,7 @@ def performance():
             subjects = ["ecse","se","sd","m1"]
             print(res)
             plt.plot(subjects,res,color=f"{colors[i]}",marker="o",label=f"{exams[i]}")
-        plt.grid(True)
-        plt.yticks(range(0, 62,5))
-        plt.xticks(range(0,4))
-        plt.title(f"Performance in each subject for {sid}!!")
+        plt.title("Your performance in each subject!")
         plt.xlabel("subjects")
         plt.ylabel("marks")
         plt.legend()        
@@ -288,9 +285,7 @@ def performance():
         os.makedirs(static_dir, exist_ok=True)
         perfplotpath = os.path.join(static_dir,f"performance.png")
         plt.savefig(perfplotpath)
-        plt.close()
-
-        return render_template("performance.html",plot = f"performance.png",mark = variable,length = length)
+        return render_template("performance.html",plot = "performance.png",mark = 10)
     return redirect('/student')
 
 @app.route('/mid_1')
