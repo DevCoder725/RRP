@@ -248,13 +248,13 @@ def performance():
         colors = ["skyblue","lightgreen","orange","red"]
         variable = -1
         length = 0
+        req_marks = []
         if(request.method == "POST"):
             target = request.form.get("target")
             print(target)
             target = int(target)
             target_marks = (target*10) - 10
             mid_avg = []
-            req_marks = []
             c.execute("SELECT m1, ecse, se, sd FROM MID_1 WHERE sid = ?", (session['sid'],))
             mid1_marks = list(c.fetchone())
             print(mid1_marks)
@@ -285,7 +285,8 @@ def performance():
         os.makedirs(static_dir, exist_ok=True)
         perfplotpath = os.path.join(static_dir,f"performance.png")
         plt.savefig(perfplotpath)
-        return render_template("performance.html",plot = "performance.png",mark = 10)
+        plt.close()
+        return render_template("performance.html",plot = "performance.png",mark = req_marks,length = length)
     return redirect('/student')
 
 @app.route('/mid_1')

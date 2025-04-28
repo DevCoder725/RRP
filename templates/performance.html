@@ -70,7 +70,11 @@
             <tbody>
                 <tr>
                 {% for i in range(length) %}
+                    {%if mark[i]<=60 %}
                     <td>{{ mark[i] }}</td>
+                    {% else %}
+                    <td>Marks in mid too less to reach target...</td>
+                    {% endif %}
                 {% endfor %}
                 </tr>
             </tbody>
