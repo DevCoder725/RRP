@@ -223,13 +223,16 @@ def std():
             finalsem = year*2 - 1
         else:
             finalsem = year*2
+        cgpa = 0
         print("finalsem gpa:",str(finalsem))
-        final = "sem"+str(finalsem)
-        cursor.execute(f"SELECT {final} FROM SGPAfin WHERE sid = ?",(session['sid'],))
-        sgpa = cursor.fetchone()
-        print(sgpa)
+        for i in range(1,finalsem):
+            final = "sem"+str(i)
+            cursor.execute(f"SELECT {final} FROM SGPAfin WHERE sid = ?",(session['sid'],))
+            sgpa = cursor.fetchone()
+            print(sgpa)
+            cgpa += sgpa[0]
         conn.close()
-        cgpa = 10
+        cgpa = round(cgpa/(finalsem-1),3)
         return render_template('s_dashboard.html', id = sid, name=name, course=course, dept=dept,year=year,sem=sem, sgpa=sgpa,cgpa = cgpa)
     else:
         flash('You must be logged in to access this page.', 'warning')
