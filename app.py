@@ -213,19 +213,24 @@ def std():
         cursor = conn.cursor()
         cursor.execute("SELECT sid, sname, course, dept,year,sem FROM student WHERE sid = ?", (session['sid'],))
         stud = cursor.fetchone()
-
         sid = stud[0]
         name = stud[1]
         course = stud[2]
         dept = stud[3]
         year=stud[4]
         sem=stud[5]
-
-        cursor.execute("SELECT sgpa FROM sgpa WHERE sid = ?",(session['sid'],))
+        if sem == 1:
+            finalsem = year*2 - 1
+        else:
+            finalsem = year*2
+        print("finalsem gpa:",str(finalsem))
+        final = "sem"+str(finalsem)
+        cursor.execute(f"SELECT {final} FROM SGPAfin WHERE sid = ?",(session['sid'],))
         sgpa = cursor.fetchone()
+        print(sgpa)
         conn.close()
-
-        return render_template('s_dashboard.html', id = sid, name=name, course=course, dept=dept,year=year,sem=sem, sgpa=sgpa)
+        cgpa = 10
+        return render_template('s_dashboard.html', id = sid, name=name, course=course, dept=dept,year=year,sem=sem, sgpa=sgpa,cgpa = cgpa)
     else:
         flash('You must be logged in to access this page.', 'warning')
         return redirect('/logout')
